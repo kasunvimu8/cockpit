@@ -5,7 +5,7 @@ import { easeInOutCubic } from '../../shared/lib/animation'
 import type { LngLat } from '../../shared/lib/geo'
 import { circlePolygon, destinationPoint, lerpAngle } from '../../shared/lib/geo'
 import type { Theme } from '../../store/settingsStore'
-import type { ViewMode } from '../../store/simulationStore'
+import { useSimulationStore, type ViewMode } from '../../store/simulationStore'
 import type { CockpitMapController } from './createCockpitMap'
 import { createCockpitMap } from './createCockpitMap'
 import type { MapAdapter, MapAdapterHandlers, VehiclePose } from './MapAdapter'
@@ -56,12 +56,14 @@ export class MaplibreMapAdapter implements MapAdapter {
   private transitionStartMs = 0
 
   constructor(container: HTMLElement, start: LngLat, theme: Theme, handlers: MapAdapterHandlers) {
-    this.controller = createCockpitMap(container, start, theme, {
+    const viewMode = useSimulationStore.getState().viewMode
+    this.controller = createCockpitMap(container, start, theme, viewMode, {
       onReady: (map) => {
         this.map = map
         // drag pans the map (entering free-look); wheel zoom stays ours via MapPanel
         map.dragPan.enable()
         map.on('dragstart', () => handlers.onUserPan?.())
+        setCarPuckMode(this.carElement, viewMode)
         this.carMarker = new Marker({
           element: this.carElement,
           rotationAlignment: 'map',

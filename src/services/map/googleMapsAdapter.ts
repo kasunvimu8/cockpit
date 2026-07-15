@@ -4,7 +4,7 @@ import { easeInOutCubic } from '../../shared/lib/animation'
 import type { LngLat } from '../../shared/lib/geo'
 import { destinationPoint, haversineDistance, lerpAngle } from '../../shared/lib/geo'
 import type { Theme } from '../../store/settingsStore'
-import type { ViewMode } from '../../store/simulationStore'
+import { useSimulationStore, type ViewMode } from '../../store/simulationStore'
 import type { MapAdapter, MapAdapterHandlers, VehiclePose } from './MapAdapter'
 import { ROUTE_CASING_COLOR, ROUTE_LINE_COLOR } from './MapAdapter'
 import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_MAP_ID } from './mapProvider'
@@ -20,7 +20,9 @@ const BEARING_SMOOTHING = 0.08
 const CHASE_AHEAD_BASE_M = 55
 /* Google zoom levels are one step above MapLibre's for the same visual scale. */
 const ZOOM_3D = 18.1
-const ZOOM_2D = 16.8
+/* Kept below ~16.75, where Google's vector style starts extruding 3D buildings — the
+   2D view must render the flat cartographic style. */
+const ZOOM_2D = 16.4
 const TILT_3D = 65
 const FOLLOW_TRANSITION_MS = 1400
 const OVERVIEW_PADDING = { top: 60, bottom: 120, left: 320, right: 70 }
@@ -103,11 +105,14 @@ export class GoogleMapsAdapter implements MapAdapter {
   private createMap(): void {
     if (!this.markerLib) return
     this.container.replaceChildren()
+    // build the map in the persisted view mode so it never loads tilted then flips flat
+    const viewMode = useSimulationStore.getState().viewMode
+    const is3d = viewMode === '3d'
     this.map = new google.maps.Map(this.container, {
       center: toLatLng(this.lastPose.position),
-      zoom: ZOOM_3D,
+      zoom: is3d ? ZOOM_3D : ZOOM_2D,
       heading: this.cameraBearing,
-      tilt: TILT_3D,
+      tilt: is3d ? TILT_3D : 0,
       mapId: GOOGLE_MAPS_MAP_ID,
       // vector rendering is required for tilt/heading — raster silently ignores them
       renderingType: 'VECTOR' as google.maps.RenderingType,
@@ -135,6 +140,7 @@ export class GoogleMapsAdapter implements MapAdapter {
       zIndex: 30,
       collisionBehavior: 'REQUIRED' as google.maps.CollisionBehavior
     })
+    setCarPuckMode(this.carElement, viewMode)
 
     this.renderRegions()
     this.renderDestination()

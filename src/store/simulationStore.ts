@@ -31,7 +31,7 @@ export const useSimulationStore = create<SimulationState>()(
       // the vehicle stays stopped on load until the driver presses Drive or Start
       playing: false,
       speedKmh: 40,
-      viewMode: '3d',
+      viewMode: '2d',
       zoomOffset: 0,
       freeLook: false,
       setPlaying: (playing) => set({ playing }),
@@ -45,6 +45,9 @@ export const useSimulationStore = create<SimulationState>()(
     }),
     {
       name: 'cockpit-simulation',
+      version: 1,
+      // one-time reset so sessions that persisted the old 3D default load in 2D
+      migrate: (persisted) => ({ ...(persisted as SimulationState), viewMode: '2d' as ViewMode }),
       partialize: (state) => ({
         speedKmh: state.speedKmh,
         viewMode: state.viewMode

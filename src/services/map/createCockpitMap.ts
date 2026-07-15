@@ -1,6 +1,7 @@
 import { Map as MaplibreMap } from 'maplibre-gl'
 import type { LngLat } from '../../shared/lib/geo'
 import type { Theme } from '../../store/settingsStore'
+import type { ViewMode } from '../../store/simulationStore'
 import {
   BUILDING_COLORS,
   BUILDINGS_LAYER_ID,
@@ -34,6 +35,7 @@ export function createCockpitMap(
   container: HTMLElement,
   center: LngLat,
   initialTheme: Theme,
+  initialViewMode: ViewMode,
   handlers: CockpitMapHandlers
 ): CockpitMapController {
   const map = new MaplibreMap({
@@ -41,7 +43,8 @@ export function createCockpitMap(
     style: vectorStyleUrl(initialTheme),
     center,
     zoom: 15.5,
-    pitch: 62,
+    // build tilted only in 3D so a 2D session never loads pitched then flattens
+    pitch: initialViewMode === '3d' ? 62 : 0,
     bearing: 0,
     attributionControl: { compact: true },
     interactive: false,
