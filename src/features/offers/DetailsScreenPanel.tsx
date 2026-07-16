@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react'
-import { fetchOfferDetails } from '../../services/offers/offersClient'
+import { fetchOfferDetails, hasDetailsScreen } from '../../services/offers/offersClient'
 import { useOffersStore } from '../../store/offersStore'
 import { useRoutePlanner, yourLocationTarget } from '../navigation/useRoutePlanner'
-import { DEV_DETAILS_FALLBACK } from './detailsScreenFallback'
 
 /**
  * DETAILS_SCREEN ad format as a side panel, opened by tapping a branded pin. Matches the
  * portal's details-screen reference: brand logo tile with POI name, live open state and
  * address, then the campaign title, product image and description, closed out by the
  * Back / Go call-to-actions. Go hands the POI to the route planner, turning the ad into
- * a guided trip. Details content is fetched on tap via the offer-assets endpoint; in dev,
- * offers that end up without details assets fall back to mock content (the dev campaign
- * only delivers BRANDED_PIN so far, and the assets endpoint needs gateway auth).
+ * a guided trip. Details content is fetched on tap via the offer-assets endpoint; offers
+ * that don't deliver the DETAILS_SCREEN format never open a panel at all.
  */
 export function DetailsScreenPanel() {
   const offer = useOffersStore((state) =>
@@ -54,9 +52,9 @@ export function DetailsScreenPanel() {
     }
   }, [offer])
 
-  if (!offer) return null
+  if (!offer || !hasDetailsScreen(offer)) return null
 
-  const details = offer.details ?? (import.meta.env.DEV ? DEV_DETAILS_FALLBACK : undefined)
+  const details = offer.details
   const logoUrl = details?.brandLogoUrl ?? offer.pinImageUrl
   const headline = details?.headline ?? offer.headline
   const close = () => useOffersStore.getState().select(null)

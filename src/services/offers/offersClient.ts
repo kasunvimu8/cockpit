@@ -94,6 +94,15 @@ export interface PoiOffer {
   offerId?: string
 }
 
+/**
+ * Whether tapping the offer's pin can open a details screen: either the content is
+ * already merged, or the campaign delivered the DETAILS_SCREEN format (content then
+ * arrives via the on-tap assets call). Pin-only campaigns open nothing.
+ */
+export function hasDetailsScreen(offer: PoiOffer): boolean {
+  return offer.details !== undefined || offer.formats.includes('DETAILS_SCREEN')
+}
+
 const asString = (value: unknown): string | undefined =>
   typeof value === 'string' && value.length > 0 ? value : undefined
 

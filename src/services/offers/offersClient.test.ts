@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import type { OffersResponseTO } from './offersClient'
-import { mapOffersResponse } from './offersClient'
+import { hasDetailsScreen, mapOffersResponse } from './offersClient'
 
 const poi = {
   poiId: 'poi-1',
@@ -188,6 +188,24 @@ test('maps the GraphQL currentlyOpen flag when the REST one is absent', () => {
     ]
   } as OffersResponseTO)
   expect(offers[0].isOpen).toBe(false)
+})
+
+test('hasDetailsScreen distinguishes pin-only offers from ones with details', () => {
+  const [pinOnly] = mapOffersResponse({ offers: [brandedPinOffer] } as OffersResponseTO)
+  expect(hasDetailsScreen(pinOnly)).toBe(false)
+  const [withDetails] = mapOffersResponse({
+    offers: [brandedPinOffer, detailsOffer]
+  } as OffersResponseTO)
+  expect(hasDetailsScreen(withDetails)).toBe(true)
+  // DETAILS_SCREEN delivered as a format without bundled content (on-tap fetch case)
+  expect(
+    hasDetailsScreen({
+      id: 'x',
+      name: 'x',
+      coord: [0, 0],
+      formats: ['BRANDED_PIN', 'DETAILS_SCREEN']
+    })
+  ).toBe(true)
 })
 
 test('skips offers without a POI location and tolerates an empty response', () => {

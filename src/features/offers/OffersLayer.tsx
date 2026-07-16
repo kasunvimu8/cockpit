@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { DEFAULT_START } from '../../data/routes'
-import { fetchNearbyOffers } from '../../services/offers/offersClient'
+import { fetchNearbyOffers, hasDetailsScreen } from '../../services/offers/offersClient'
 import { useBootStore } from '../../store/bootStore'
 import { useOffersStore } from '../../store/offersStore'
 import { useSettingsStore } from '../../store/settingsStore'
@@ -58,7 +58,10 @@ export function OffersLayer() {
         coord: offer.coord,
         imageUrl: offer.pinImageUrl ?? offer.details?.brandLogoUrl ?? null,
         name: offer.name,
-        onSelect: () => useOffersStore.getState().select(offer.id)
+        // pin-only campaigns have no details screen to open, so their taps are inert
+        onSelect: hasDetailsScreen(offer)
+          ? () => useOffersStore.getState().select(offer.id)
+          : () => {}
       }))
     )
     return () => adapter.setOfferPins([])
