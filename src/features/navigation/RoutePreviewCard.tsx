@@ -29,7 +29,7 @@ export function RoutePreviewCard() {
   }
 
   return (
-    <div className="absolute bottom-3 left-1/2 z-6 flex -translate-x-1/2 items-center gap-3.5 rounded-[14px] border border-line bg-surface py-2.5 pl-4 pr-3 shadow-[0_10px_30px_#00000026]">
+    <div className="absolute bottom-3 left-1/2 z-6 flex -translate-x-1/2 items-center gap-3.5 rounded-[14px] border border-btn-border bg-surface py-2.5 pl-4 pr-3 shadow-[0_10px_30px_#00000026] backdrop-blur-sm">
       <div className="flex min-w-[120px] max-w-[260px] flex-col gap-px">
         <b className="overflow-hidden text-ellipsis whitespace-nowrap text-base font-extrabold text-nav-green">
           {etaLabel}

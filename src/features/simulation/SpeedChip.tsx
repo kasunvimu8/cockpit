@@ -6,7 +6,7 @@ export function SpeedChip() {
   const speedKmh = useSimulationStore((state) => state.speedKmh)
 
   return (
-    <div className="absolute bottom-3 left-3 z-5 rounded-[14px] border border-line bg-surface px-4 py-2 text-center shadow-[0_6px_20px_#0000001a]">
+    <div className="absolute bottom-3 left-3 z-5 rounded-[14px] border border-btn-border bg-surface px-4 py-2 text-center shadow-[0_6px_20px_#0000001a] backdrop-blur-sm">
       <div className="font-mono text-3xl font-semibold leading-none text-text">
         {playing ? speedKmh : 0}
       </div>
