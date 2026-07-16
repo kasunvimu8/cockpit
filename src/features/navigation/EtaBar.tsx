@@ -28,7 +28,7 @@ export function EtaBar() {
   }
 
   return (
-    <div className="absolute bottom-3 left-1/2 z-6 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-line bg-surface py-2 pl-4.5 pr-2 shadow-[0_10px_30px_#00000026]">
+    <div className="absolute bottom-3 left-1/2 z-6 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-btn-border bg-surface py-2 pl-4.5 pr-2 shadow-[0_10px_30px_#00000026] backdrop-blur-sm">
       <span className="whitespace-nowrap text-base font-extrabold text-nav-green">
         {remainingLabel}
       </span>

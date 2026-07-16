@@ -74,8 +74,11 @@ export function DirectionsPanel() {
     activeField !== null && (query.trim().length >= MIN_QUERY_LENGTH || activeField === 'origin')
 
   return (
-    <div ref={panelRef} className="absolute left-3 top-3 z-6 w-[300px]">
-      <div className="flex items-center rounded-[14px] border border-line bg-surface py-1 pl-3.5 pr-1.5 shadow-[0_6px_24px_#0000001f]">
+    <div
+      ref={panelRef}
+      className="absolute left-[calc(var(--hu)*82px)] top-[calc(var(--hu)*72px)] z-8 w-[300px]"
+    >
+      <div className="flex items-center rounded-[14px] border border-btn-border bg-surface py-1 pl-3.5 pr-1.5 shadow-[0_6px_24px_#0000001f] backdrop-blur-sm">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 border-b border-line py-2.5">
             <span className="h-2.5 w-2.5 flex-none rounded-full border-[2.5px] border-[#4285f4] bg-white" />

@@ -2,47 +2,53 @@
 
 :root {
   --bezel: #0c0d0f;
-  --screen: #fbfbfc;
-  --line: #e4e6ea;
-  --text: #26292e;
-  --muted: #8b919b;
-  --accent: #2470d8;
+  --screen: #ffffff;
+  --line: #e4e9f2;
+  --text: #16243c;
+  --muted: #64708a;
+  --accent: #2f6fed;
   --teal: #0ea5a0;
   --amber: #d97706;
   --red: #d23b2e;
   /* floating chips, cards and docks over the map */
-  --surface: #fffffff2;
-  --surface-2: #ffffffe8;
-  --hover: #f2f6fc;
-  --active-bg: #e3eefc;
-  --chip: #eef1f6;
+  --surface: #ffffffeb;
+  --surface-2: #ffffffe0;
+  --hover: #ecf4fc;
+  --active-bg: #e0edfb;
+  --chip: #ecf4fc;
+  --pill: #e0edfbcc;
+  --btn-bg: #ecf4fccc;
+  --btn-border: #16243c33;
   --nav-green: #188038;
-  --launcher-bg: #f4f5f8;
-  --launcher-line: #e4e6ea;
-  --launcher-text: #454c59;
-  --launcher-muted: #9aa1ac;
-  --launcher-hover: #00000012;
+  --launcher-bg: #f8fafc;
+  --launcher-line: #e4e9f2;
+  --launcher-text: #16243c;
+  --launcher-muted: #64708a;
+  --launcher-hover: #16243c0f;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --sans: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 :root[data-theme="dark"] {
-  --screen: #14161a;
-  --line: #2b3038;
-  --text: #e8eaee;
-  --muted: #9099a6;
-  --accent: #4d94f0;
+  --screen: #10141d;
+  --line: #232c3d;
+  --text: #eef2f9;
+  --muted: #8b96ad;
+  --accent: #5b8ff2;
   --teal: #2dd4bf;
-  --surface: #1b1e24f2;
-  --surface-2: #1b1e24e8;
-  --hover: #252a33;
+  --surface: #171d29f2;
+  --surface-2: #171d29e0;
+  --hover: #1c2536;
   --active-bg: #1d3556;
-  --chip: #232830;
+  --chip: #1c2536;
+  --pill: #1d3556cc;
+  --btn-bg: #1c2536cc;
+  --btn-border: #eef2f933;
   --nav-green: #4cd07d;
-  --launcher-bg: #0b0d10;
-  --launcher-line: #23272e;
-  --launcher-text: #c7ccd4;
-  --launcher-muted: #5c626b;
+  --launcher-bg: #0e1219;
+  --launcher-line: #232c3d;
+  --launcher-text: #eef2f9;
+  --launcher-muted: #8b96ad;
   --launcher-hover: #ffffff14;
 }
 
@@ -60,6 +66,9 @@
   --color-hover: var(--hover);
   --color-active-bg: var(--active-bg);
   --color-chip: var(--chip);
+  --color-pill: var(--pill);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-border: var(--btn-border);
   --color-nav-green: var(--nav-green);
   --color-launcher-bg: var(--launcher-bg);
   --color-launcher-line: var(--launcher-line);
