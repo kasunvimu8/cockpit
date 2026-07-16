@@ -2,10 +2,12 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// internal supply-provisioning-service (offers); proxied to avoid browser CORS
+// internal supply-provisioning-service (offers); proxied to avoid browser CORS.
+// ClusterIP pinned directly because macOS DNS for telepresence cluster names is flaky;
+// refresh via: kubectl --context aks-emea-dev -n fourscreen get svc supply-provisioning-service
 const SUPPLY_PROXY = {
   '/api/supply': {
-    target: 'http://supply-provisioning-service.fourscreen:8080',
+    target: 'http://10.0.197.101:8080',
     changeOrigin: true
   }
 }

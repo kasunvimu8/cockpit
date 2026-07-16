@@ -110,6 +110,86 @@ test('prefers the English asset when multiple languages are present', () => {
   expect(offers[0].details?.headline).toBe('Fresh deals')
 })
 
+/**
+ * Modelled on a real dev-campaign offer ("Load Testing Inc."): one BRANDED_PIN offer
+ * carrying its DETAILS_SCREEN assets inline (additionalAdFormats), with the GraphQL
+ * field variants (currentlyOpen/streetNumber null) and a DETAILS_BASIC content that
+ * has no callToActions or productImageUrl2.
+ */
+test('maps a branded pin offer with inline details assets and GraphQL field variants', () => {
+  const offers = mapOffersResponse({
+    offers: [
+      {
+        adFormat: 'BRANDED_PIN',
+        offerId: 'opaque-token',
+        campaignId: '8550a899-581c-419c-b95f-e3aeca79f2b0',
+        organization: { organizationName: 'Load Testing Inc.' },
+        poi: {
+          poiId: '93f2948f-c598-46e7-9c60-9342c2d98093',
+          name: 'Benecke-Tonn 9420',
+          location: { latitude: 48.18278, longitude: 11.56933 },
+          street: 'Okerstr. 30b',
+          streetNumber: null,
+          postalCode: '24979',
+          city: 'Ost Talea',
+          categories: ['MARKETS_AND_FOOD_STORES'],
+          currentlyOpen: null
+        },
+        assets: [
+          {
+            adFormatType: 'DETAILS_SCREEN',
+            assetType: 'DETAILS_BASIC',
+            language: 'en',
+            content: {
+              headline: 'Test Headline',
+              description: 'Test description.',
+              brandLogoUrl: 'https://cdn/brandLogoUrl.png',
+              productImageUrl1: 'https://cdn/productImageUrl1.png'
+            }
+          },
+          {
+            adFormatType: 'BRANDED_PIN',
+            assetType: 'BRANDED_PIN_BASIC',
+            language: 'en',
+            content: { mapPinImageUrl: 'https://cdn/mapPinImageUrl.png' }
+          }
+        ]
+      }
+    ]
+  } as OffersResponseTO)
+  expect(offers).toHaveLength(1)
+  expect(offers[0]).toMatchObject({
+    id: '93f2948f-c598-46e7-9c60-9342c2d98093',
+    formats: ['BRANDED_PIN'],
+    offerId: 'opaque-token',
+    address: 'Okerstr. 30b, 24979 Ost Talea',
+    pinImageUrl: 'https://cdn/mapPinImageUrl.png'
+  })
+  // currentlyOpen: null means "unknown" — the open/closed badge must stay hidden
+  expect(offers[0].isOpen).toBeUndefined()
+  expect(offers[0].details).toEqual({
+    headline: 'Test Headline',
+    description: 'Test description.',
+    brandLogoUrl: 'https://cdn/brandLogoUrl.png',
+    productImageUrl1: 'https://cdn/productImageUrl1.png',
+    productImageUrl2: undefined,
+    callToActions: []
+  })
+})
+
+test('maps the GraphQL currentlyOpen flag when the REST one is absent', () => {
+  const offers = mapOffersResponse({
+    offers: [
+      {
+        adFormat: 'BRANDED_PIN',
+        offerId: 'x',
+        poi: { ...poi, isCurrentlyOpen: undefined, currentlyOpen: false }
+      }
+    ]
+  } as OffersResponseTO)
+  expect(offers[0].isOpen).toBe(false)
+})
+
 test('skips offers without a POI location and tolerates an empty response', () => {
   expect(mapOffersResponse({})).toEqual([])
   expect(

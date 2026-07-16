@@ -8,6 +8,7 @@ import type { LngLat } from '../../shared/lib/geo'
  */
 
 const OFFERS_ENDPOINT = '/api/supply/v1/internal/offers'
+const OFFER_ASSETS_ENDPOINT = '/api/supply/v1/offers/assets'
 const DEVICE_ID = 'HACKATHON_DEMO_DEVICE'
 /** The service rejects radii above 30 km. */
 export const OFFERS_MAX_RADIUS_M = 30000
@@ -35,11 +36,13 @@ interface OfferPoiTO {
   name: string
   location: { latitude: number; longitude: number }
   street?: string
-  streetNumber?: string
+  streetNumber?: string | null
   postalCode?: string
   city?: string
   categories?: string[]
   isCurrentlyOpen?: boolean
+  /** GraphQL variant of isCurrentlyOpen (portal/BFF responses), null when unknown. */
+  currentlyOpen?: boolean | null
 }
 
 interface OfferTO {
@@ -87,6 +90,8 @@ export interface PoiOffer {
   pinImageUrl?: string
   headline?: string
   details?: DetailsScreenContent
+  /** Opaque offer token for the on-tap assets call (fetchOfferDetails). */
+  offerId?: string
 }
 
 const asString = (value: unknown): string | undefined =>
@@ -96,6 +101,24 @@ const asString = (value: unknown): string | undefined =>
 function pickAsset(assets: OfferAssetTO[], assetType: string): OfferAssetTO | undefined {
   const matching = assets.filter((asset) => asset.assetType === assetType && asset.content)
   return matching.find((asset) => asset.language.toLowerCase().startsWith('en')) ?? matching[0]
+}
+
+/** Maps a DETAILS_BASIC asset into the domain shape, if the offer carries one. */
+function detailsContent(assets: OfferAssetTO[]): DetailsScreenContent | undefined {
+  const details = pickAsset(assets, 'DETAILS_BASIC')?.content
+  if (!details) return undefined
+  return {
+    headline: asString(details.headline),
+    description: asString(details.description),
+    brandLogoUrl: asString(details.brandLogoUrl),
+    productImageUrl1: asString(details.productImageUrl1),
+    productImageUrl2: asString(details.productImageUrl2),
+    callToActions: Array.isArray(details.callToActions)
+      ? details.callToActions
+          .map((cta) => asString((cta as Record<string, unknown>)?.actionType))
+          .filter((action): action is string => action !== undefined)
+      : []
+  }
 }
 
 function poiAddress(poi: OfferPoiTO): string | undefined {
@@ -119,7 +142,7 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
       coord: [poi.location.longitude, poi.location.latitude],
       formats: [],
       address: poiAddress(poi),
-      isOpen: poi.isCurrentlyOpen,
+      isOpen: poi.isCurrentlyOpen ?? poi.currentlyOpen ?? undefined,
       category: poi.categories?.[0],
       campaignId: offer.campaignId,
       organizationName: offer.organization?.organizationName ?? offer.organizationName
@@ -133,6 +156,7 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
     for (const format of delivered) {
       if (!target.formats.includes(format)) target.formats.push(format)
     }
+    target.offerId = target.offerId ?? offer.offerId
 
     const assets = offer.assets ?? []
     const pin = pickAsset(assets, 'BRANDED_PIN_BASIC')?.content
@@ -140,21 +164,7 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
       target.pinImageUrl = asString(pin.mapPinImageUrl) ?? target.pinImageUrl
       target.headline = asString(pin.headline) ?? target.headline
     }
-    const details = pickAsset(assets, 'DETAILS_BASIC')?.content
-    if (details) {
-      target.details = {
-        headline: asString(details.headline),
-        description: asString(details.description),
-        brandLogoUrl: asString(details.brandLogoUrl),
-        productImageUrl1: asString(details.productImageUrl1),
-        productImageUrl2: asString(details.productImageUrl2),
-        callToActions: Array.isArray(details.callToActions)
-          ? details.callToActions
-              .map((cta) => asString((cta as Record<string, unknown>)?.actionType))
-              .filter((action): action is string => action !== undefined)
-          : []
-      }
-    }
+    target.details = detailsContent(assets) ?? target.details
     byPoi.set(id, target)
   }
   return [...byPoi.values()]
@@ -199,4 +209,23 @@ export async function fetchNearbyOffers(
   })
   if (!response.ok) throw new Error(`Offers request failed with ${response.status}`)
   return mapOffersResponse((await response.json()) as OffersResponseTO)
+}
+
+/**
+ * Fetches the full asset set for one offer (GET /api/supply/v1/offers/assets) and returns
+ * its details-screen content — the production flow for opening a details screen from a
+ * branded pin: pins stay lightweight and details assets are only retrieved (and counted)
+ * on tap. NOTE: unlike /internal/offers this endpoint sits behind the API gateway's auth;
+ * hit directly in the dev cluster it currently answers 403, so callers must treat a
+ * failure as "no details" and fall back to the nearby-response content.
+ */
+export async function fetchOfferDetails(
+  offerId: string
+): Promise<DetailsScreenContent | undefined> {
+  const response = await fetch(`${OFFER_ASSETS_ENDPOINT}?offerId=${encodeURIComponent(offerId)}`, {
+    headers: { 'Offer-Language': 'en-us,en' }
+  })
+  if (!response.ok) throw new Error(`Offer assets request failed with ${response.status}`)
+  const body = (await response.json()) as { assets?: OfferAssetTO[] }
+  return detailsContent(body.assets ?? [])
 }

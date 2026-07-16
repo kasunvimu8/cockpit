@@ -83,7 +83,9 @@ export function MapView() {
 
   return (
     <>
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* h-full/w-full needed alongside inset-0: MapLibre's own .maplibregl-map CSS
+          sets position: relative on the container, which disables inset sizing */}
+      <div ref={containerRef} className="absolute inset-0 h-full w-full" />
       <BootOverlay />
       <NoticeBanner />
     </>
