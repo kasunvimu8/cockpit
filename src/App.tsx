@@ -1,6 +1,5 @@
 import { CockpitFrame } from './features/cockpit/CockpitFrame'
 import { HeadUnit } from './features/headUnit/HeadUnit'
-import { Launcher } from './features/headUnit/Launcher'
 import { Logo } from './features/headUnit/Logo'
 import { StatusIndicators } from './features/headUnit/StatusIndicators'
 import { DestinationMarker } from './features/map/DestinationMarker'
@@ -53,7 +52,6 @@ export function App() {
             <SettingsPanel />
           </MapPanel>
         </MapProvider>
-        <Launcher />
       </HeadUnit>
     </CockpitFrame>
   )

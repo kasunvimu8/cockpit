@@ -119,3 +119,93 @@ export function VolumeIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+/** Heart glyph — favourites search category. */
+export function HeartIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Coffee cup glyph — cafe search category. */
+export function CoffeeIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M18.5 3H6c-1.1 0-2 .9-2 2v5.71c0 3.83 2.95 7.18 6.78 7.29 3.96.12 7.22-3.06 7.22-7v-1h.5c1.93 0 3.5-1.57 3.5-3.5S20.43 3 18.5 3ZM18.5 8H18V5h.5c.83 0 1.5.67 1.5 1.5S19.33 8 18.5 8ZM4 21h16v-2H4v2Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Burger glyph — food search category. */
+export function BurgerIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 16h20c0 2.21-1.79 4-4 4H6c-2.21 0-4-1.79-4-4Zm0-5h20v2.5H2V11Zm4-7h12c2.21 0 4 1.79 4 4v1H2V8c0-2.21 1.79-4 4-4Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Fuel pump glyph — petrol/charging search category. */
+export function FuelIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M19.77 7.23l.01-.01-3.72-3.72L15 4.56l2.11 2.11c-.94.36-1.61 1.26-1.61 2.33 0 1.38 1.12 2.5 2.5 2.5.36 0 .69-.08 1-.21v7.21c0 .55-.45 1-1 1s-1-.45-1-1V14c0-1.1-.9-2-2-2h-1V5c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v16h10v-7.5h1.5v5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V9c0-.69-.28-1.32-.73-1.77ZM12 10H6V5h6v5Zm6 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Parking "P" glyph — parking search category. */
+export function ParkingIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M13 3H6v18h4v-6h3c3.31 0 6-2.69 6-6s-2.69-6-6-6Zm.2 8H10V7h3.2c1.1 0 2 .9 2 2s-.9 2-2 2Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
