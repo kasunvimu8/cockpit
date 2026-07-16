@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { OFFERS_MAX_RADIUS_M, OFFERS_MIN_RADIUS_M } from '../../services/offers/offersClient'
 import type { Theme } from '../../store/settingsStore'
-import { useSettingsStore } from '../../store/settingsStore'
+import {
+  RECOMMENDATION_DELAY_MAX_S,
+  RECOMMENDATION_DELAY_MIN_S,
+  useSettingsStore
+} from '../../store/settingsStore'
 import type { ViewMode } from '../../store/simulationStore'
 import {
   SPEED_MAX_KMH,
@@ -10,6 +14,7 @@ import {
   useSimulationStore
 } from '../../store/simulationStore'
 import { AdFormatSelect } from './AdFormatSelect'
+import { RecommendationTriggerSelect } from './RecommendationTriggerSelect'
 
 const VIEW_MODES: { value: ViewMode; label: string }[] = [
   { value: '2d', label: '2D' },
@@ -34,6 +39,9 @@ export function SettingsPanel() {
   const setTheme = useSettingsStore((state) => state.setTheme)
   const offersRadiusM = useSettingsStore((state) => state.offersRadiusM)
   const setOffersRadiusM = useSettingsStore((state) => state.setOffersRadiusM)
+  const offersAdFormats = useSettingsStore((state) => state.offersAdFormats)
+  const recommendationDelayS = useSettingsStore((state) => state.recommendationDelayS)
+  const setRecommendationDelayS = useSettingsStore((state) => state.setRecommendationDelayS)
   const speedKmh = useSimulationStore((state) => state.speedKmh)
   const setSpeedKmh = useSimulationStore((state) => state.setSpeedKmh)
   const viewMode = useSimulationStore((state) => state.viewMode)
@@ -147,6 +155,30 @@ export function SettingsPanel() {
             <span className="text-[12.5px] text-text">Ad formats</span>
             <AdFormatSelect />
           </div>
+          {offersAdFormats.includes('RECOMMENDATION') && (
+            <>
+              <div className="flex items-center justify-between gap-4 pb-3 pt-1.5 pl-3">
+                <span className="text-[12.5px] text-muted">Triggers</span>
+                <RecommendationTriggerSelect />
+              </div>
+              <div className="flex items-center justify-between gap-4 pb-3 pt-1.5 pl-3">
+                <span className="text-[12.5px] text-muted">Trigger after</span>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    className="w-18 rounded-lg border border-line bg-chip px-2 py-[7px] text-right font-mono text-xs text-text"
+                    min={RECOMMENDATION_DELAY_MIN_S}
+                    max={RECOMMENDATION_DELAY_MAX_S}
+                    step={5}
+                    value={recommendationDelayS}
+                    aria-label="Recommendation trigger delay in seconds"
+                    onChange={(event) => setRecommendationDelayS(Number(event.target.value))}
+                  />
+                  <span className="text-xs text-muted">s</span>
+                </div>
+              </div>
+            </>
+          )}
         </section>
 
         <section className="border-t border-line pb-1 pt-2.5">

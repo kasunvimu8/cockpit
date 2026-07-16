@@ -17,6 +17,24 @@ export const OFFERS_MIN_RADIUS_M = 500
 /** Ad formats the driver can enable in the settings panel. */
 export type OfferAdFormat = 'BRANDED_PIN' | 'RECOMMENDATION' | 'SEARCH'
 
+/**
+ * Vehicle triggers accepted for the RECOMMENDATION ad format, in the order listed by the
+ * service's OpenAPI schema. Requests take at most ONE trigger per ad-format entry:
+ * `{ "adFormatType": "RECOMMENDATION", "triggers": ["TRIGGER_FUELLOW"] }`.
+ */
+export const RECOMMENDATION_TRIGGERS = [
+  'TRIGGER_FUELLOW',
+  'TRIGGER_BATTERYLOW',
+  'TRIGGER_OILLOW',
+  'TRIGGER_SERVICEDUE',
+  'TRIGGER_BREAKNEEDED',
+  'TRIGGER_LOWSPEED',
+  'TRIGGER_JOURNEYEND',
+  'TRIGGER_JOURNEYSTART'
+] as const
+
+export type RecommendationTrigger = (typeof RECOMMENDATION_TRIGGERS)[number]
+
 const BRAND = (import.meta.env.VITE_OFFERS_BRAND ?? '').trim() || 'BRAND_TOYOTA'
 const ASSET_CONSUMER_ID =
   (import.meta.env.VITE_OFFERS_ASSET_CONSUMER_ID ?? '').trim() ||
@@ -74,6 +92,13 @@ export interface DetailsScreenContent {
   callToActions: string[]
 }
 
+/** RECOMMENDATION_BASIC asset content shown in the in-drive recommendation card. */
+export interface RecommendationContent {
+  headline?: string
+  description?: string
+  brandLogoImageUrl?: string
+}
+
 /** All offer content for one POI: pin visual (BRANDED_PIN) + details screen assets. */
 export interface PoiOffer {
   id: string
@@ -90,6 +115,7 @@ export interface PoiOffer {
   pinImageUrl?: string
   headline?: string
   details?: DetailsScreenContent
+  recommendation?: RecommendationContent
   /** Opaque offer token for the on-tap assets call (fetchOfferDetails). */
   offerId?: string
 }
@@ -174,6 +200,14 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
       target.headline = asString(pin.headline) ?? target.headline
     }
     target.details = detailsContent(assets) ?? target.details
+    const recommendation = pickAsset(assets, 'RECOMMENDATION_BASIC')?.content
+    if (recommendation) {
+      target.recommendation = {
+        headline: asString(recommendation.headline),
+        description: asString(recommendation.description),
+        brandLogoImageUrl: asString(recommendation.brandLogoImageUrl)
+      }
+    }
     byPoi.set(id, target)
   }
   return [...byPoi.values()]
@@ -181,13 +215,16 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
 
 /**
  * Fetches offers of the selected ad formats around `center` ([lng, lat]). DETAILS_SCREEN
- * is always requested alongside: it provides the details view opened from a branded pin.
+ * is always requested alongside: it provides the details view opened from a branded pin
+ * or a recommendation. `recommendationTrigger` narrows RECOMMENDATION offers to campaigns
+ * targeting that vehicle trigger (the service accepts at most one trigger per request).
  */
 export async function fetchNearbyOffers(
   center: LngLat,
   adFormats: OfferAdFormat[],
   radiusInMeter = OFFERS_MAX_RADIUS_M,
-  limit = 20
+  limit = 20,
+  recommendationTrigger?: RecommendationTrigger
 ): Promise<PoiOffer[]> {
   const requested = [...new Set([...adFormats, 'DETAILS_SCREEN'])]
   const response = await fetch(OFFERS_ENDPOINT, {
@@ -212,7 +249,11 @@ export async function fetchNearbyOffers(
           )
         }
       },
-      adFormats: requested.map((adFormatType) => ({ adFormatType })),
+      adFormats: requested.map((adFormatType) =>
+        adFormatType === 'RECOMMENDATION' && recommendationTrigger
+          ? { adFormatType, triggers: [recommendationTrigger] }
+          : { adFormatType }
+      ),
       limit
     })
   })

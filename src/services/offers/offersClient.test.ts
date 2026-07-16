@@ -105,6 +105,37 @@ test('maps details-screen assets bundled into a branded pin offer (new API shape
   expect(offers[0].details?.headline).toBe('Fresh deals')
 })
 
+test('maps RECOMMENDATION_BASIC content into the recommendation field', () => {
+  const recommendationOffer = {
+    adFormat: 'RECOMMENDATION',
+    offerId: 'offer-rec',
+    adFormatsWithAssets: ['RECOMMENDATION', 'DETAILS_SCREEN'],
+    poi,
+    assets: [
+      {
+        adFormatType: 'RECOMMENDATION',
+        assetType: 'RECOMMENDATION_BASIC',
+        language: 'en',
+        content: {
+          brandLogoImageUrl: 'https://cdn/rec-logo.png',
+          headline: 'Save 20% Every Charg',
+          description: 'Fast, reliable EV charging wit'
+        }
+      },
+      ...detailsOffer.assets
+    ]
+  }
+  const offers = mapOffersResponse({ offers: [recommendationOffer] } as OffersResponseTO)
+  expect(offers).toHaveLength(1)
+  expect(offers[0].formats).toEqual(['RECOMMENDATION', 'DETAILS_SCREEN'])
+  expect(offers[0].recommendation).toEqual({
+    headline: 'Save 20% Every Charg',
+    description: 'Fast, reliable EV charging wit',
+    brandLogoImageUrl: 'https://cdn/rec-logo.png'
+  })
+  expect(offers[0].details?.headline).toBe('Fresh deals')
+})
+
 test('prefers the English asset when multiple languages are present', () => {
   const offers = mapOffersResponse({ offers: [detailsOffer] } as OffersResponseTO)
   expect(offers[0].details?.headline).toBe('Fresh deals')

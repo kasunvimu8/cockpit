@@ -16,6 +16,8 @@ import { RoutePreviewCard } from './features/navigation/RoutePreviewCard'
 import { SearchPanel } from './features/navigation/SearchPanel'
 import { DetailsScreenPanel } from './features/offers/DetailsScreenPanel'
 import { OffersLayer } from './features/offers/OffersLayer'
+import { RecommendationCard } from './features/offers/RecommendationCard'
+import { RecommendationScheduler } from './features/offers/RecommendationScheduler'
 import { SettingsButton } from './features/settings/SettingsButton'
 import { SettingsPanel } from './features/settings/SettingsPanel'
 import { useApplyTheme } from './features/settings/useApplyTheme'
@@ -41,6 +43,8 @@ export function App() {
             <DirectionsPanel />
             <ManeuverBanner />
             <RoutePreviewCard />
+            <RecommendationScheduler />
+            <RecommendationCard />
             <DetailsScreenPanel />
             <EtaBar />
             <SpeedChip />
