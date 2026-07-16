@@ -8,6 +8,14 @@ export interface VehiclePose {
   bearing: number
 }
 
+/** A branded-pin ad offer rendered on the map; `onSelect` opens its details screen. */
+export interface OfferPinVO {
+  id: string
+  coord: LngLat
+  imageUrl: string | null
+  onSelect: () => void
+}
+
 export const ROUTE_LINE_COLOR = '#7aaefb'
 export const ROUTE_CASING_COLOR = '#ffffff'
 
@@ -20,6 +28,8 @@ export interface MapAdapter {
   updateFrame(pose: VehiclePose, viewMode: ViewMode, zoomOffset: number, follow: boolean): void
   /** Replaces the rendered campaign regions (circle + pin per region). */
   setCampaignRegions(regions: CampaignRegion[]): void
+  /** Replaces the rendered branded-pin ad offers. */
+  setOfferPins(pins: OfferPinVO[]): void
   /** Shows the destination flag, or removes it when null. */
   setDestination(coord: LngLat | null): void
   /** Draws the guidance polyline for the journey, or removes it when null. */

@@ -8,13 +8,14 @@ import type { Theme } from '../../store/settingsStore'
 import { useSimulationStore, type ViewMode } from '../../store/simulationStore'
 import type { CockpitMapController } from './createCockpitMap'
 import { createCockpitMap } from './createCockpitMap'
-import type { MapAdapter, MapAdapterHandlers, VehiclePose } from './MapAdapter'
+import type { MapAdapter, MapAdapterHandlers, OfferPinVO, VehiclePose } from './MapAdapter'
 import { ROUTE_CASING_COLOR, ROUTE_LINE_COLOR } from './MapAdapter'
 import { BUILDINGS_LAYER_ID } from './mapStyles'
 import {
   createCampaignPinElement,
   createCarPuckElement,
   createDestinationFlagElement,
+  createOfferPinElement,
   setCarPuckMode
 } from './markerElements'
 
@@ -48,6 +49,8 @@ export class MaplibreMapAdapter implements MapAdapter {
   private regionMarkers: Marker[] = []
   private regionLayerIds: string[] = []
   private regionSourceIds: string[] = []
+  private offerPins: OfferPinVO[] = []
+  private offerMarkers: Marker[] = []
   private destinationMarker: Marker | null = null
   private routePath: LngLat[] | null = null
   private cameraBearing = 0
@@ -72,6 +75,7 @@ export class MaplibreMapAdapter implements MapAdapter {
           .setLngLat(start)
           .addTo(map)
         this.renderRegions()
+        this.renderOfferPins()
         this.renderRoutePath()
         handlers.onReady()
       },
@@ -173,6 +177,11 @@ export class MaplibreMapAdapter implements MapAdapter {
     this.renderRegions()
   }
 
+  setOfferPins(pins: OfferPinVO[]): void {
+    this.offerPins = pins
+    this.renderOfferPins()
+  }
+
   setDestination(coord: LngLat | null): void {
     this.destinationMarker?.remove()
     this.destinationMarker = null
@@ -226,6 +235,7 @@ export class MaplibreMapAdapter implements MapAdapter {
 
   dispose(): void {
     this.clearRegions()
+    this.clearOfferPins()
     this.destinationMarker?.remove()
     this.carMarker?.remove()
     this.controller.dispose()
@@ -320,6 +330,25 @@ export class MaplibreMapAdapter implements MapAdapter {
     }
     this.regionLayerIds = []
     this.regionSourceIds = []
+  }
+
+  /* markers are DOM overlays: unlike layers they survive base-style swaps untouched */
+  private renderOfferPins(): void {
+    this.clearOfferPins()
+    const map = this.map
+    if (!map || this.offerPins.length === 0) return
+    for (const pin of this.offerPins) {
+      const element = createOfferPinElement(pin.imageUrl)
+      element.addEventListener('click', pin.onSelect)
+      this.offerMarkers.push(
+        new Marker({ element, anchor: 'bottom' }).setLngLat(pin.coord).addTo(map)
+      )
+    }
+  }
+
+  private clearOfferPins(): void {
+    for (const marker of this.offerMarkers) marker.remove()
+    this.offerMarkers = []
   }
 
   private setBuildingsVisible(visible: boolean): void {

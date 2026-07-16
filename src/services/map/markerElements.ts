@@ -51,6 +51,37 @@ export function createCampaignPinElement(region: CampaignRegion): HTMLElement {
   return pin
 }
 
+/**
+ * Branded-pin marker for ad offers, following the portal's BRANDED_PIN preview: a white
+ * rounded card filled by the campaign's map-pin image, with a map-marker tail below.
+ * Anchored at the bottom (the tail tip sits on the POI).
+ */
+export function createOfferPinElement(imageUrl: string | null): HTMLElement {
+  const pin = document.createElement('div')
+  pin.className = 'flex cursor-pointer flex-col items-center drop-shadow-[0_4px_10px_#00000045]'
+  const card = document.createElement('div')
+  card.className =
+    'flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border-2 border-white bg-white'
+  if (imageUrl) {
+    const image = document.createElement('img')
+    image.src = imageUrl
+    image.alt = ''
+    image.draggable = false
+    image.className = 'h-full w-full rounded-[10px] object-cover'
+    card.appendChild(image)
+  } else {
+    const fallback = document.createElement('span')
+    fallback.className = 'text-lg'
+    fallback.textContent = '🏷️'
+    card.appendChild(fallback)
+  }
+  const tail = document.createElement('div')
+  tail.className = 'z-[-1] -mt-2 h-3.5 w-3.5 rotate-45 rounded-[2px] bg-white'
+  pin.appendChild(card)
+  pin.appendChild(tail)
+  return pin
+}
+
 /** Chequered-flag disc for the active navigation destination. */
 export function createDestinationFlagElement(): HTMLElement {
   const flag = document.createElement('div')

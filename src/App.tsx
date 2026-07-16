@@ -14,6 +14,8 @@ import { EtaBar } from './features/navigation/EtaBar'
 import { ManeuverBanner } from './features/navigation/ManeuverBanner'
 import { RoutePreviewCard } from './features/navigation/RoutePreviewCard'
 import { SearchPanel } from './features/navigation/SearchPanel'
+import { DetailsScreenPanel } from './features/offers/DetailsScreenPanel'
+import { OffersLayer } from './features/offers/OffersLayer'
 import { SettingsButton } from './features/settings/SettingsButton'
 import { SettingsPanel } from './features/settings/SettingsPanel'
 import { useApplyTheme } from './features/settings/useApplyTheme'
@@ -34,10 +36,12 @@ export function App() {
             <SimulationController />
             <DestinationMarker />
             <RouteLayer />
+            <OffersLayer />
             <SearchPanel />
             <DirectionsPanel />
             <ManeuverBanner />
             <RoutePreviewCard />
+            <DetailsScreenPanel />
             <EtaBar />
             <SpeedChip />
             <ZoomControls />

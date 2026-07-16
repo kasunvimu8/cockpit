@@ -5,13 +5,14 @@ import type { LngLat } from '../../shared/lib/geo'
 import { destinationPoint, haversineDistance, lerpAngle } from '../../shared/lib/geo'
 import type { Theme } from '../../store/settingsStore'
 import { useSimulationStore, type ViewMode } from '../../store/simulationStore'
-import type { MapAdapter, MapAdapterHandlers, VehiclePose } from './MapAdapter'
+import type { MapAdapter, MapAdapterHandlers, OfferPinVO, VehiclePose } from './MapAdapter'
 import { ROUTE_CASING_COLOR, ROUTE_LINE_COLOR } from './MapAdapter'
 import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_MAP_ID } from './mapProvider'
 import {
   createCampaignPinElement,
   createCarPuckElement,
   createDestinationFlagElement,
+  createOfferPinElement,
   setCarPuckMode
 } from './markerElements'
 
@@ -59,9 +60,11 @@ export class GoogleMapsAdapter implements MapAdapter {
   private carRotator: HTMLElement | null = null
   private circles: google.maps.Circle[] = []
   private pins: google.maps.marker.AdvancedMarkerElement[] = []
+  private offerMarkers: google.maps.marker.AdvancedMarkerElement[] = []
   private destinationMarker: google.maps.marker.AdvancedMarkerElement | null = null
   private routeLines: google.maps.Polyline[] = []
   private regions: CampaignRegion[] = []
+  private offerPins: OfferPinVO[] = []
   private destination: LngLat | null = null
   private routePath: LngLat[] | null = null
   private theme: Theme
@@ -143,6 +146,7 @@ export class GoogleMapsAdapter implements MapAdapter {
     setCarPuckMode(this.carElement, viewMode)
 
     this.renderRegions()
+    this.renderOfferPins()
     this.renderDestination()
     this.renderRoutePath()
     this.lastCamera = null
@@ -261,6 +265,11 @@ export class GoogleMapsAdapter implements MapAdapter {
     this.renderRegions()
   }
 
+  setOfferPins(pins: OfferPinVO[]): void {
+    this.offerPins = pins
+    this.renderOfferPins()
+  }
+
   setDestination(coord: LngLat | null): void {
     this.destination = coord
     this.renderDestination()
@@ -303,6 +312,7 @@ export class GoogleMapsAdapter implements MapAdapter {
   dispose(): void {
     this.disposed = true
     this.clearRegions()
+    this.clearOfferPins()
     this.clearRouteLines()
     if (this.destinationMarker) this.destinationMarker.map = null
     if (this.carMarker) this.carMarker.map = null
@@ -374,6 +384,29 @@ export class GoogleMapsAdapter implements MapAdapter {
     for (const pin of this.pins) pin.map = null
     this.circles = []
     this.pins = []
+  }
+
+  private renderOfferPins(): void {
+    this.clearOfferPins()
+    const map = this.map
+    if (!map || !this.markerLib || this.offerPins.length === 0) return
+    for (const pin of this.offerPins) {
+      const marker = new this.markerLib.AdvancedMarkerElement({
+        map,
+        position: toLatLng(pin.coord),
+        content: createOfferPinElement(pin.imageUrl),
+        zIndex: 15,
+        gmpClickable: true,
+        collisionBehavior: 'REQUIRED' as google.maps.CollisionBehavior
+      })
+      marker.addListener('click', pin.onSelect)
+      this.offerMarkers.push(marker)
+    }
+  }
+
+  private clearOfferPins(): void {
+    for (const marker of this.offerMarkers) marker.map = null
+    this.offerMarkers = []
   }
 
   private renderDestination(): void {

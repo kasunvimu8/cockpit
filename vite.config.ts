@@ -2,13 +2,23 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+// internal supply-provisioning-service (offers); proxied to avoid browser CORS
+const SUPPLY_PROXY = {
+  '/api/supply': {
+    target: 'http://supply-provisioning-service.fourscreen:8080',
+    changeOrigin: true
+  }
+}
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 3000
+    port: 3000,
+    proxy: SUPPLY_PROXY
   },
   preview: {
-    port: 3000
+    port: 3000,
+    proxy: SUPPLY_PROXY
   },
   build: {
     rollupOptions: {

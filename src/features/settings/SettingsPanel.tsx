@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { OFFERS_MAX_RADIUS_M, OFFERS_MIN_RADIUS_M } from '../../services/offers/offersClient'
 import type { Theme } from '../../store/settingsStore'
 import { useSettingsStore } from '../../store/settingsStore'
 import type { ViewMode } from '../../store/simulationStore'
@@ -8,6 +9,7 @@ import {
   SPEED_STEP_KMH,
   useSimulationStore
 } from '../../store/simulationStore'
+import { AdFormatSelect } from './AdFormatSelect'
 
 const VIEW_MODES: { value: ViewMode; label: string }[] = [
   { value: '2d', label: '2D' },
@@ -30,6 +32,8 @@ export function SettingsPanel() {
   const closePanel = useSettingsStore((state) => state.closePanel)
   const theme = useSettingsStore((state) => state.theme)
   const setTheme = useSettingsStore((state) => state.setTheme)
+  const offersRadiusM = useSettingsStore((state) => state.offersRadiusM)
+  const setOffersRadiusM = useSettingsStore((state) => state.setOffersRadiusM)
   const speedKmh = useSimulationStore((state) => state.speedKmh)
   const setSpeedKmh = useSimulationStore((state) => state.setSpeedKmh)
   const viewMode = useSimulationStore((state) => state.viewMode)
@@ -118,6 +122,30 @@ export function SettingsPanel() {
                 </button>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="border-t border-line pb-1 pt-2.5">
+          <h3 className="mb-2.5 text-[10px] uppercase tracking-[0.12em] text-muted">Offers</h3>
+          <div className="flex items-center justify-between gap-4 pb-3 pt-1.5">
+            <span className="text-[12.5px] text-text">Search radius</span>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                className="w-18 rounded-lg border border-line bg-chip px-2 py-[7px] text-right font-mono text-xs text-text"
+                min={OFFERS_MIN_RADIUS_M / 1000}
+                max={OFFERS_MAX_RADIUS_M / 1000}
+                step={0.5}
+                value={offersRadiusM / 1000}
+                aria-label="Offers search radius in kilometres"
+                onChange={(event) => setOffersRadiusM(Number(event.target.value) * 1000)}
+              />
+              <span className="text-xs text-muted">km</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-4 pb-3 pt-1.5">
+            <span className="text-[12.5px] text-text">Ad formats</span>
+            <AdFormatSelect />
           </div>
         </section>
 
