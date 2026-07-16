@@ -25,7 +25,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       theme: 'light',
       panelOpen: false,
-      offersRadiusM: OFFERS_MAX_RADIUS_M,
+      // matches the reference offers call (10 km around the vehicle)
+      offersRadiusM: 10000,
       offersAdFormats: ['BRANDED_PIN'],
       setTheme: (theme) => set({ theme }),
       openPanel: () => set({ panelOpen: true }),

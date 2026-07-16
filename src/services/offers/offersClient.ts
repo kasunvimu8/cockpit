@@ -46,6 +46,9 @@ interface OfferTO {
   adFormat: string
   offerId: string
   campaignId?: string
+  /** All formats this offer carries assets for (a BP offer can bundle its DS assets). */
+  adFormatsWithAssets?: string[]
+  additionalAdFormats?: string[]
   poi?: OfferPoiTO
   organizationName?: string
   organization?: { organizationName?: string }
@@ -121,7 +124,15 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
       campaignId: offer.campaignId,
       organizationName: offer.organization?.organizationName ?? offer.organizationName
     }
-    if (!target.formats.includes(offer.adFormat)) target.formats.push(offer.adFormat)
+    // the new API bundles secondary formats (e.g. DETAILS_SCREEN) into the main offer
+    const delivered = [
+      offer.adFormat,
+      ...(offer.adFormatsWithAssets ?? []),
+      ...(offer.additionalAdFormats ?? [])
+    ]
+    for (const format of delivered) {
+      if (!target.formats.includes(format)) target.formats.push(format)
+    }
 
     const assets = offer.assets ?? []
     const pin = pickAsset(assets, 'BRANDED_PIN_BASIC')?.content

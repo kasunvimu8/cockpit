@@ -91,6 +91,20 @@ test('merges branded pin and details screen offers on the same POI', () => {
   })
 })
 
+test('maps details-screen assets bundled into a branded pin offer (new API shape)', () => {
+  const bundledOffer = {
+    ...brandedPinOffer,
+    adFormatsWithAssets: ['BRANDED_PIN', 'DETAILS_SCREEN'],
+    additionalAdFormats: ['DETAILS_SCREEN'],
+    assets: [...brandedPinOffer.assets, ...detailsOffer.assets]
+  }
+  const offers = mapOffersResponse({ offers: [bundledOffer] } as OffersResponseTO)
+  expect(offers).toHaveLength(1)
+  expect(offers[0].formats).toEqual(['BRANDED_PIN', 'DETAILS_SCREEN'])
+  expect(offers[0].pinImageUrl).toBe('https://cdn/pin.png')
+  expect(offers[0].details?.headline).toBe('Fresh deals')
+})
+
 test('prefers the English asset when multiple languages are present', () => {
   const offers = mapOffersResponse({ offers: [detailsOffer] } as OffersResponseTO)
   expect(offers[0].details?.headline).toBe('Fresh deals')
