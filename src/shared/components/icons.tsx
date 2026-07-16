@@ -209,3 +209,42 @@ export function ParkingIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+/** Megaphone glyph — sponsored search-result header. */
+export function MegaphoneIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M20 3v14l-8-3.5H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h6L20 3ZM6.8 15.5h3.1l1.1 4.4a1 1 0 0 1-.97 1.24H9.06a1 1 0 0 1-.97-.76l-1.29-4.88Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Back / return arrow glyph. */
+export function BackIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M9.5 14.5 4 9l5.5-5.5M4 9h10a6 6 0 0 1 6 6v4.5"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}

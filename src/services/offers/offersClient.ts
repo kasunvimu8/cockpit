@@ -99,6 +99,12 @@ export interface RecommendationContent {
   brandLogoImageUrl?: string
 }
 
+/** SEARCH_BASIC asset content shown on sponsored search-result cards. */
+export interface SearchAdContent {
+  headline?: string
+  brandLogoImageUrl?: string
+}
+
 /** All offer content for one POI: pin visual (BRANDED_PIN) + details screen assets. */
 export interface PoiOffer {
   id: string
@@ -116,6 +122,7 @@ export interface PoiOffer {
   headline?: string
   details?: DetailsScreenContent
   recommendation?: RecommendationContent
+  searchAd?: SearchAdContent
   /** Opaque offer token for the on-tap assets call (fetchOfferDetails). */
   offerId?: string
 }
@@ -208,6 +215,13 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
         brandLogoImageUrl: asString(recommendation.brandLogoImageUrl)
       }
     }
+    const searchAd = pickAsset(assets, 'SEARCH_BASIC')?.content
+    if (searchAd) {
+      target.searchAd = {
+        headline: asString(searchAd.headline),
+        brandLogoImageUrl: asString(searchAd.brandLogoImageUrl)
+      }
+    }
     byPoi.set(id, target)
   }
   return [...byPoi.values()]
@@ -217,14 +231,16 @@ export function mapOffersResponse(response: OffersResponseTO): PoiOffer[] {
  * Fetches offers of the selected ad formats around `center` ([lng, lat]). DETAILS_SCREEN
  * is always requested alongside: it provides the details view opened from a branded pin
  * or a recommendation. `recommendationTrigger` narrows RECOMMENDATION offers to campaigns
- * targeting that vehicle trigger (the service accepts at most one trigger per request).
+ * targeting that vehicle trigger (the service accepts at most one trigger per request);
+ * `categories` narrows the offers to POIs of the given categories (e.g. CAFE).
  */
 export async function fetchNearbyOffers(
   center: LngLat,
   adFormats: OfferAdFormat[],
   radiusInMeter = OFFERS_MAX_RADIUS_M,
   limit = 20,
-  recommendationTrigger?: RecommendationTrigger
+  recommendationTrigger?: RecommendationTrigger,
+  categories?: string[]
 ): Promise<PoiOffer[]> {
   const requested = [...new Set([...adFormats, 'DETAILS_SCREEN'])]
   const response = await fetch(OFFERS_ENDPOINT, {
@@ -254,6 +270,7 @@ export async function fetchNearbyOffers(
           ? { adFormatType, triggers: [recommendationTrigger] }
           : { adFormatType }
       ),
+      ...(categories?.length ? { categories } : {}),
       limit
     })
   })

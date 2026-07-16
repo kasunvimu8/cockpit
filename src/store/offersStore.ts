@@ -27,6 +27,8 @@ interface OffersState {
   /** Presents a recommendation card, upserting its offer into the result set. */
   showRecommendation: (offer: PoiOffer, trigger: RecommendationTrigger | null) => void
   dismissRecommendation: () => void
+  /** Adds or refreshes an offer (e.g. a sponsored search result) in the result set. */
+  upsertOffer: (offer: PoiOffer) => void
 }
 
 /** Live ad offers (branded pins + details screens) fetched around the vehicle. */
@@ -60,7 +62,15 @@ export const useOffersStore = create<OffersState>()((set) => ({
         : [...state.offers, offer],
       recommendation: { offerId: offer.id, trigger }
     })),
-  dismissRecommendation: () => set({ recommendation: null })
+  dismissRecommendation: () => set({ recommendation: null }),
+  upsertOffer: (offer) =>
+    set((state) => ({
+      offers: state.offers.some((candidate) => candidate.id === offer.id)
+        ? state.offers.map((candidate) =>
+            candidate.id === offer.id ? { ...candidate, ...offer } : candidate
+          )
+        : [...state.offers, offer]
+    }))
 }))
 
 if (import.meta.env.DEV) {

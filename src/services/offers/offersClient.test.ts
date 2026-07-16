@@ -136,6 +136,34 @@ test('maps RECOMMENDATION_BASIC content into the recommendation field', () => {
   expect(offers[0].details?.headline).toBe('Fresh deals')
 })
 
+test('maps SEARCH_BASIC content into the searchAd field', () => {
+  const searchOffer = {
+    adFormat: 'SEARCH',
+    offerId: 'offer-search',
+    adFormatsWithAssets: ['SEARCH', 'DETAILS_SCREEN'],
+    poi,
+    assets: [
+      {
+        adFormatType: 'SEARCH',
+        assetType: 'SEARCH_BASIC',
+        language: 'en',
+        content: {
+          brandLogoImageUrl: 'https://cdn/search-logo.png',
+          headline: 'Save 20% Every Charg'
+        }
+      },
+      ...detailsOffer.assets
+    ]
+  }
+  const offers = mapOffersResponse({ offers: [searchOffer] } as OffersResponseTO)
+  expect(offers).toHaveLength(1)
+  expect(offers[0].searchAd).toEqual({
+    headline: 'Save 20% Every Charg',
+    brandLogoImageUrl: 'https://cdn/search-logo.png'
+  })
+  expect(offers[0].details?.headline).toBe('Fresh deals')
+})
+
 test('prefers the English asset when multiple languages are present', () => {
   const offers = mapOffersResponse({ offers: [detailsOffer] } as OffersResponseTO)
   expect(offers[0].details?.headline).toBe('Fresh deals')

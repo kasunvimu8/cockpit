@@ -11,6 +11,40 @@ export interface PlaceSuggestion {
   resolve: () => Promise<LngLat>
 }
 
+export interface PlaceResult {
+  id: string
+  name: string
+  address: string
+  coord: LngLat
+}
+
+/** Category/text search returning full places (name, address, coordinate) immediately. */
+export async function searchPlacesByText(
+  query: string,
+  near: LngLat,
+  maxResultCount = 6
+): Promise<PlaceResult[]> {
+  const places = await importLibrary('places')
+  const { places: results } = await places.Place.searchByText({
+    textQuery: query,
+    fields: ['id', 'displayName', 'formattedAddress', 'location'],
+    locationBias: { center: { lat: near[1], lng: near[0] }, radius: LOCATION_BIAS_RADIUS_M },
+    maxResultCount
+  })
+  return results.flatMap((place) => {
+    const location = place.location
+    if (!location) return []
+    return [
+      {
+        id: place.id,
+        name: place.displayName ?? 'Unknown place',
+        address: place.formattedAddress ?? '',
+        coord: [location.lng(), location.lat()] as LngLat
+      }
+    ]
+  })
+}
+
 let sessionToken: google.maps.places.AutocompleteSessionToken | null = null
 
 /** Autocomplete suggestions from the Google Places API, biased around the vehicle. */
