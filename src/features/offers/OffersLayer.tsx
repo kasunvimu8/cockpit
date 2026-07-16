@@ -57,6 +57,7 @@ export function OffersLayer() {
         id: offer.id,
         coord: offer.coord,
         imageUrl: offer.pinImageUrl ?? offer.details?.brandLogoUrl ?? null,
+        name: offer.name,
         onSelect: () => useOffersStore.getState().select(offer.id)
       }))
     )

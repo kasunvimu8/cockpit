@@ -394,7 +394,7 @@ export class GoogleMapsAdapter implements MapAdapter {
       const marker = new this.markerLib.AdvancedMarkerElement({
         map,
         position: toLatLng(pin.coord),
-        content: createOfferPinElement(pin.imageUrl),
+        content: createOfferPinElement(pin.imageUrl, pin.name),
         zIndex: 15,
         gmpClickable: true,
         collisionBehavior: 'REQUIRED' as google.maps.CollisionBehavior

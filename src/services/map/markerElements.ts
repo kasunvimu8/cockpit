@@ -52,33 +52,46 @@ export function createCampaignPinElement(region: CampaignRegion): HTMLElement {
 }
 
 /**
- * Branded-pin marker for ad offers, following the portal's BRANDED_PIN preview: a white
- * rounded card filled by the campaign's map-pin image, with a map-marker tail below.
- * Anchored at the bottom (the tail tip sits on the POI).
+ * Branded-pin marker for ad offers, following the bp_default design: a white pin card
+ * with 15px corner radius, the campaign image on a grey inner container, a rounded tail,
+ * and the POI name as a map-style label (dark text, white halo) below the tip. The label
+ * is absolutely positioned so the marker's bottom anchor stays on the tail tip.
  */
-export function createOfferPinElement(imageUrl: string | null): HTMLElement {
+export function createOfferPinElement(imageUrl: string | null, name: string): HTMLElement {
   const pin = document.createElement('div')
-  pin.className = 'flex cursor-pointer flex-col items-center drop-shadow-[0_4px_10px_#00000045]'
+  pin.className =
+    'relative flex cursor-pointer flex-col items-center drop-shadow-[0_4px_10px_#00000045]'
   const card = document.createElement('div')
-  card.className =
-    'flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border-2 border-white bg-white'
+  card.className = 'rounded-[15px] border-4 border-white bg-white'
+  // the grey block framing the brand image (visible for transparent art and while loading)
+  const imageContainer = document.createElement('div')
+  imageContainer.className =
+    'flex h-11 w-11 items-center justify-center overflow-hidden rounded-[11px] bg-[#ededed]'
   if (imageUrl) {
     const image = document.createElement('img')
     image.src = imageUrl
     image.alt = ''
     image.draggable = false
-    image.className = 'h-full w-full rounded-[10px] object-cover'
-    card.appendChild(image)
+    image.className = 'h-full w-full object-cover'
+    imageContainer.appendChild(image)
   } else {
     const fallback = document.createElement('span')
     fallback.className = 'text-lg'
     fallback.textContent = '🏷️'
-    card.appendChild(fallback)
+    imageContainer.appendChild(fallback)
   }
+  card.appendChild(imageContainer)
   const tail = document.createElement('div')
-  tail.className = 'z-[-1] -mt-2 h-3.5 w-3.5 rotate-45 rounded-[2px] bg-white'
+  tail.className = 'z-[-1] -mt-[9px] h-4 w-4 rotate-45 rounded-[3px] bg-white'
+  const label = document.createElement('span')
+  label.className =
+    'absolute left-1/2 top-full max-w-[120px] -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap pt-0.5 text-center text-xs font-semibold text-[#26292e]'
+  label.style.textShadow =
+    '0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff'
+  label.textContent = name
   pin.appendChild(card)
   pin.appendChild(tail)
+  pin.appendChild(label)
   return pin
 }
 

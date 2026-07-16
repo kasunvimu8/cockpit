@@ -8,7 +8,7 @@ import type { LngLat } from '../../shared/lib/geo'
  */
 
 const OFFERS_ENDPOINT = '/api/supply/v1/internal/offers'
-const DEVICE_ID = 'WDBRF40J43F433102'
+const DEVICE_ID = 'HACKATHON_DEMO_DEVICE'
 /** The service rejects radii above 30 km. */
 export const OFFERS_MAX_RADIUS_M = 30000
 export const OFFERS_MIN_RADIUS_M = 500

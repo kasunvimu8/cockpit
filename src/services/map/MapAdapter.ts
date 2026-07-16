@@ -13,6 +13,8 @@ export interface OfferPinVO {
   id: string
   coord: LngLat
   imageUrl: string | null
+  /** POI name shown as a map label below the pin. */
+  name: string
   onSelect: () => void
 }
 

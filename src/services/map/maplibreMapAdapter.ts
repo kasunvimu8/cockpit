@@ -338,7 +338,7 @@ export class MaplibreMapAdapter implements MapAdapter {
     const map = this.map
     if (!map || this.offerPins.length === 0) return
     for (const pin of this.offerPins) {
-      const element = createOfferPinElement(pin.imageUrl)
+      const element = createOfferPinElement(pin.imageUrl, pin.name)
       element.addEventListener('click', pin.onSelect)
       this.offerMarkers.push(
         new Marker({ element, anchor: 'bottom' }).setLngLat(pin.coord).addTo(map)
